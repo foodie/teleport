@@ -23,10 +23,12 @@ import (
 // Plug-ins during runtime
 
 type (
+	//实现了名字的接口
 	// Plugin plugin background
 	Plugin interface {
 		Name() string
 	}
+	//实现各种插件
 	// PreNewPeerPlugin is executed before creating peer.
 	PreNewPeerPlugin interface {
 		Plugin
@@ -144,6 +146,7 @@ type (
 	}
 )
 
+//新建一个插件容器
 // newPluginContainer new a plugin container.
 func newPluginContainer() *PluginContainer {
 	return new(PluginContainer)
@@ -154,6 +157,7 @@ type PluginContainer struct {
 	plugins []Plugin
 }
 
+//把当前插件放到插件的左边
 // AppendLeft appends plugins on the left side of the pluginContainer.
 func (p *PluginContainer) AppendLeft(plugins ...Plugin) {
 	if plugins == nil {
@@ -177,6 +181,7 @@ func (p *PluginContainer) AppendLeft(plugins ...Plugin) {
 	p.plugins = plugins
 }
 
+//放入右边
 // AppendRight appends plugins on the right side of the pluginContainer.
 func (p *PluginContainer) AppendRight(plugins ...Plugin) {
 	if p.plugins == nil {
@@ -196,6 +201,7 @@ func (p *PluginContainer) AppendRight(plugins ...Plugin) {
 	}
 }
 
+//克隆插件
 func (p *PluginContainer) cloneAppendRight(plugins ...Plugin) *PluginContainer {
 	clone := newPluginContainer()
 	clone.AppendRight(p.GetAll()...)
@@ -203,6 +209,7 @@ func (p *PluginContainer) cloneAppendRight(plugins ...Plugin) *PluginContainer {
 	return clone
 }
 
+//移除插件
 // Remove removes a plugin by it's name.
 func (p *PluginContainer) Remove(pluginName string) error {
 	if p.plugins == nil {
@@ -226,6 +233,7 @@ func (p *PluginContainer) Remove(pluginName string) error {
 	return nil
 }
 
+//根据名字，获取插件
 // GetByName returns a plugin instance by it's name.
 func (p *PluginContainer) GetByName(pluginName string) Plugin {
 	if p.plugins == nil {
@@ -239,10 +247,13 @@ func (p *PluginContainer) GetByName(pluginName string) Plugin {
 	return nil
 }
 
+//获取所有的插件
 // GetAll returns all activated plugins.
 func (p *PluginContainer) GetAll() []Plugin {
 	return p.plugins
 }
+
+//插件执行
 
 // PreNewPeer executes the defined plugins before creating peer.
 func (p *PluginContainer) PreNewPeer(peerConfig *PeerConfig) {
@@ -563,6 +574,7 @@ func (p *PluginContainer) PostDisconnect(sess BaseSession) *Rerror {
 	return nil
 }
 
+//各种插件错误
 func warnInvaildHandlerHooks(plugin []Plugin) {
 	for _, p := range plugin {
 		switch p.(type) {

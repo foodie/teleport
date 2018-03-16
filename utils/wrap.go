@@ -4,6 +4,7 @@ import (
 	"io"
 )
 
+//writer的脚手架
 // WriterWrap writer wrapper
 type WriterWrap struct {
 	w     io.Writer
@@ -28,6 +29,7 @@ func (wp *WriterWrap) Reset(w io.Writer) {
 	wp.count = 0
 }
 
+//reader的脚手架
 // ReaderWrap reader wrapper
 type ReaderWrap struct {
 	r     io.Reader

@@ -23,11 +23,14 @@ import (
 )
 
 type (
+
 	// XferPipe transfer filter pipe, handlers from outer-most to inner-most.
 	// Note: the length can not be bigger than 255!
+	//传输数据的过滤管道容器
 	XferPipe struct {
 		filters []XferFilter
 	}
+	//传输数据的过滤管道
 	// XferFilter handles byte stream of packet when transfer.
 	XferFilter interface {
 		// Id returns transfer filter id.
@@ -39,11 +42,13 @@ type (
 	}
 )
 
+//重置
 // Reset resets transfer filter pipe.
 func (x *XferPipe) Reset() {
 	x.filters = x.filters[:0]
 }
 
+//添加pipe
 // Append appends transfer filter by id.
 func (x *XferPipe) Append(filterId ...byte) error {
 	for _, id := range filterId {
@@ -56,6 +61,7 @@ func (x *XferPipe) Append(filterId ...byte) error {
 	return x.check()
 }
 
+//从另外一个里面添加
 // AppendFrom appends transfer filters from a *XferPipe.
 func (x *XferPipe) AppendFrom(src *XferPipe) {
 	for _, filter := range src.filters {
@@ -63,6 +69,7 @@ func (x *XferPipe) AppendFrom(src *XferPipe) {
 	}
 }
 
+//太长
 func (x *XferPipe) check() error {
 	if x.Len() > math.MaxUint8 {
 		return ErrXferPipeTooLong
@@ -70,6 +77,7 @@ func (x *XferPipe) check() error {
 	return nil
 }
 
+//获取长度
 // Len returns the length of transfer pipe.
 func (x *XferPipe) Len() int {
 	if x == nil {
@@ -78,6 +86,7 @@ func (x *XferPipe) Len() int {
 	return len(x.filters)
 }
 
+//获取id列表
 // Ids returns the id list of transfer filters.
 func (x *XferPipe) Ids() []byte {
 	var ids = make([]byte, x.Len())
@@ -90,6 +99,7 @@ func (x *XferPipe) Ids() []byte {
 	return ids
 }
 
+//回调过滤器
 // Range calls f sequentially for each XferFilter present in the XferPipe.
 // If f returns false, range stops the iteration.
 func (x *XferPipe) Range(callback func(idx int, filter XferFilter) bool) {
@@ -100,6 +110,7 @@ func (x *XferPipe) Range(callback func(idx int, filter XferFilter) bool) {
 	}
 }
 
+//通过filter包装数据
 // OnPack packs transfer byte stream, from inner-most to outer-most.
 func (x *XferPipe) OnPack(data []byte) ([]byte, error) {
 	var err error
@@ -111,6 +122,7 @@ func (x *XferPipe) OnPack(data []byte) ([]byte, error) {
 	return data, err
 }
 
+//通过filter解包装数据
 // OnUnpack unpacks transfer byte stream, from outer-most to inner-most.
 func (x *XferPipe) OnUnpack(data []byte) ([]byte, error) {
 	var err error
@@ -123,15 +135,18 @@ func (x *XferPipe) OnUnpack(data []byte) ([]byte, error) {
 	return data, err
 }
 
+//xferFilterMap的大Map
 var xferFilterMap = struct {
 	idMap map[byte]XferFilter
 }{
 	idMap: make(map[byte]XferFilter),
 }
 
+//错误
 // ErrXferPipeTooLong error
 var ErrXferPipeTooLong = errors.New("The length of transfer pipe cannot be bigger than 255")
 
+//注册xferFilterMap
 // Reg registers transfer filter.
 func Reg(xferFilter XferFilter) {
 	if _, ok := xferFilterMap.idMap[xferFilter.Id()]; ok {
@@ -140,6 +155,7 @@ func Reg(xferFilter XferFilter) {
 	xferFilterMap.idMap[xferFilter.Id()] = xferFilter
 }
 
+//从map里面获取
 // Get returns transfer filter.
 func Get(id byte) (XferFilter, error) {
 	xferFilter, ok := xferFilterMap.idMap[id]

@@ -70,6 +70,7 @@ func init() {
 	SetShutdown(5*time.Second, nil, nil)
 }
 
+//平滑的重启
 // GraceSignal open graceful shutdown or reboot signal.
 func GraceSignal() {
 	graceful.GraceSignal()

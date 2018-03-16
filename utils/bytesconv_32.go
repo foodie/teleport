@@ -2,6 +2,7 @@
 
 package utils
 
+//变量定义
 const (
 	maxIntChars    = 9
 	maxHexIntChars = 7

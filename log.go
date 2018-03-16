@@ -24,6 +24,7 @@ import (
 	"github.com/henrylee2cn/goutil/graceful"
 )
 
+//定义接口
 // Logger interface
 type Logger interface {
 	// Level returns the logger's level.
@@ -54,6 +55,7 @@ type Logger interface {
 }
 
 var (
+	//全局日志
 	// global logger
 	globalLogger = func() Logger {
 		logger := newDefaultlogger("TRACE")
@@ -62,6 +64,7 @@ var (
 	}()
 )
 
+//新建一个
 func newDefaultlogger(level string) Logger {
 	l := &defaultLogger{
 		level: level,
@@ -76,6 +79,7 @@ type defaultLogger struct {
 	mu    sync.RWMutex
 }
 
+//基本日志
 func (l *defaultLogger) newSet() {
 	var consoleLogBackend = &logging.LogBackend{
 		Logger: log.New(color.NewColorableStdout(), "", 0),

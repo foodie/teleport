@@ -239,6 +239,7 @@ TRYGO:
 
 var printPidOnce sync.Once
 
+//打印pid
 func doPrintPid() {
 	printPidOnce.Do(func() {
 		Printf("The current process PID: %d", os.Getpid())

@@ -24,10 +24,12 @@ const (
 	ID_JSON   = 'j'
 )
 
+//注册codec
 func init() {
 	Reg(new(JsonCodec))
 }
 
+//定义json解析器
 // JsonCodec json codec
 type JsonCodec struct{}
 
@@ -41,11 +43,13 @@ func (JsonCodec) Id() byte {
 	return ID_JSON
 }
 
+//编码
 // Marshal returns the JSON encoding of v.
 func (JsonCodec) Marshal(v interface{}) ([]byte, error) {
 	return json.Marshal(v)
 }
 
+//解码
 // Unmarshal parses the JSON-encoded data and stores the result
 // in the value pointed to by v.
 func (JsonCodec) Unmarshal(data []byte, v interface{}) error {

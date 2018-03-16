@@ -23,6 +23,7 @@ import (
 
 var _ flate.Reader = new(BufioReader)
 
+//基本的封装
 // BufioReader an io.Reader object buffer with count and limit.
 type BufioReader struct {
 	reader *bufio.Reader

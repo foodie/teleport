@@ -32,15 +32,23 @@ import (
 )
 
 type (
+	//基础的节点
 	// BasePeer peer with the common method set
 	BasePeer interface {
 		// Close closes peer.
+		//关闭
 		Close() (err error)
+		//计算session数量
 		// CountSession returns the number of sessions.
 		CountSession() int
-		// Dial connects with the peer of the destination address.
+
+		//拨号连接
+		// Dial connects with the peer of the
+		//destination address.
 		Dial(addr string, protoFunc ...socket.ProtoFunc) (Session, *Rerror)
-		// DialContext connects with the peer of the destination address, using the provided context.
+		// DialContext connects with the peer of
+		//拨号连接 和ctx一起
+		//the destination address, using the provided context.
 		DialContext(ctx context.Context, addr string, protoFunc ...socket.ProtoFunc) (Session, *Rerror)
 		// GetSession gets the session by id.
 		GetSession(sessionId string) (Session, bool)
@@ -75,6 +83,8 @@ type (
 		// SetUnknownPush sets the default handler, which is called when no handler for PUSH is found.
 		SetUnknownPush(fn func(UnknownPushCtx) *Rerror, plugin ...Plugin)
 	}
+
+	//公共的peer接口
 	// Peer the communication peer which is server or client role
 	Peer interface {
 		EarlyPeer
@@ -117,15 +127,24 @@ var (
 	_ Peer      = new(peer)
 )
 
+//新建一个通信端点
 // NewPeer creates a new peer.
 func NewPeer(cfg PeerConfig, plugin ...Plugin) Peer {
-	doPrintPid()
+	doPrintPid() //打印pid
+
+	//新建插件容器，注册插件
 	pluginContainer := newPluginContainer()
 	pluginContainer.AppendRight(plugin...)
+
+	//执行插件
 	pluginContainer.PreNewPeer(&cfg)
+
+	//检测配置
 	if err := cfg.check(); err != nil {
 		Fatalf("%v", err)
 	}
+
+	//新建一个peer
 	var p = &peer{
 		router:             newRouter("/", pluginContainer),
 		pluginContainer:    pluginContainer,
@@ -141,11 +160,14 @@ func NewPeer(cfg PeerConfig, plugin ...Plugin) Peer {
 		countTime:          cfg.CountTime,
 		redialTimes:        cfg.RedialTimes,
 	}
+
+	//默认的解析器是json
 	if c, err := codec.GetByName(cfg.DefaultBodyCodec); err != nil {
 		Fatalf("%v", err)
 	} else {
 		p.defaultBodyCodec = c.Id()
 	}
+
 	if p.countTime {
 		p.timeNow = time.Now
 		p.timeSince = time.Since
@@ -154,7 +176,9 @@ func NewPeer(cfg PeerConfig, plugin ...Plugin) Peer {
 		p.timeNow = func() time.Time { return t0 }
 		p.timeSince = func(time.Time) time.Duration { return 0 }
 	}
+
 	addPeer(p)
+
 	p.pluginContainer.PostNewPeer(p)
 	return p
 }

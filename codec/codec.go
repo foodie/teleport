@@ -20,6 +20,7 @@ import (
 	"fmt"
 )
 
+//定义codec接口
 // Codec makes the body's Encoder and Decoder
 type Codec interface {
 	// Id returns codec id.
@@ -33,6 +34,8 @@ type Codec interface {
 	Unmarshal(data []byte, v interface{}) error
 }
 
+//定义codec map，
+//string--codec, byte-codec
 var codecMap = struct {
 	nameMap map[string]Codec
 	idMap   map[byte]Codec
@@ -48,6 +51,7 @@ const (
 	NilCodecName string = ""
 )
 
+//注册codec
 // Reg registers Codec
 func Reg(codec Codec) {
 	if codec.Id() == NilCodecId {
@@ -63,6 +67,7 @@ func Reg(codec Codec) {
 	codecMap.idMap[codec.Id()] = codec
 }
 
+//获取codec
 // Get returns Codec
 func Get(id byte) (Codec, error) {
 	codec, ok := codecMap.idMap[id]
@@ -72,6 +77,7 @@ func Get(id byte) (Codec, error) {
 	return codec, nil
 }
 
+//获取名字
 // GetByName returns Codec
 func GetByName(name string) (Codec, error) {
 	codec, ok := codecMap.nameMap[name]
